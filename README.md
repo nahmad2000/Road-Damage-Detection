@@ -39,10 +39,10 @@ Here is an overview of the dataset structure:
 
 ## Repository Contents:
 
-1. preprocessing.py
+### 1. preprocessing.py
 This script contains a set of functions for preprocessing the RDD2022 dataset, making it ready for machine learning.
 
-### Functions:
+#### Functions:
 
 * check_dataset(dataset_dir): Verify the presence of annotations for each image.
 * convert_annotation(dataset_dir, classes): Convert annotations to YOLOv8 format and create a class mapping YAML file.
@@ -55,18 +55,21 @@ This script contains a set of functions for preprocessing the RDD2022 dataset, m
 * create_yaml(dataset_dir, classes): Generate a YAML file for the dataset, an essential requirement for YOLOv8.
 
 
-### Usage:
+#### Usage:
 
-#### Install required Python libraries:
+##### Install required Python libraries:
 
+```
+pip install matplotlib opencv-python-headless seaborn PyYAML
+```
 
-#### Define"dataset_dir" variable as following:
+##### Define"dataset_dir" variable as following:
 dataset_dir = path to "RDD2022" folder containing the 7 sub-datasets (countries-datasets) as seen in the dataset structure above.
 
-#### Note:
+##### Note:
 Some functions should only be excuted once. If excuted more than once then the dataset might be ruined! See comments in the preprocessing.py script.
 
 
-2. yolov8.py
+### 2. yolov8.py
 This Python script facilitates training a YOLOv8 model using the preprocessed RDD2022 dataset. Customization of dataset paths, configuration, and model training settings is required.
 It will be added later In Shaa Allah.
