@@ -5,19 +5,7 @@ Road infrastructure is prone to deterioration, and the presence of cracks poses 
 
 
 ## Dataset
-- The dataset used is the .
-- The dataset can be downloaded from .
-- This dataset is a mix of 7 datasets gathered from different cities: 
-  - China_Drone
-  - China_MotorBike
-  - Czech
-  - India
-  - Japan
-  - Norway
-  - United_States
-
-
-Our work utilizes the Road Damage Detection 2022 (RDD2022) dataset. This comprehensive dataset can be accessed via this [link](https://doi.org/10.48550/arXiv.2209.08538), and the data can be downloaded from this [source](https://figshare.com/articles/dataset/RDD2022_-_The_multi-national_Road_Damage_Dataset_released_through_CRDDC_2022/21431547?file=38030820).
+This work utilizes the Road Damage Detection 2022 (RDD2022) dataset. This comprehensive dataset can be accessed via this [link](https://doi.org/10.48550/arXiv.2209.08538), and the data can be downloaded from this [source](https://figshare.com/articles/dataset/RDD2022_-_The_multi-national_Road_Damage_Dataset_released_through_CRDDC_2022/21431547?file=38030820).
 
 RDD2022 combines data from seven distinct datasets collected across various cities, including:
 - China_Drone
@@ -46,7 +34,7 @@ Here is an overview of the dataset structure:
     |       |   \---xmls
     |       \---images
     ...
-
+```
 
 
 ## Repository Contents:
