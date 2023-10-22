@@ -45,7 +45,7 @@ This script contains a set of functions for preprocessing the RDD2022 dataset, m
 #### Functions:
 
 * check_dataset(dataset_dir): Verify the presence of annotations for each image.
-* convert_annotation(dataset_dir, classes): Convert annotations to YOLOv8 format and create a class mapping YAML file.
+* convert_annotation(dataset_dir, classes): Convert annotations to YOLOv8 format.
 * get_dataset_plots(dataset_dir, classes): Generate bar plots displaying dataset statistics, including the number of images per country and objects per class for each country.
 * visualize_dataset(dataset_dir, num_images): Display random images from the dataset with their bounding boxes and class labels.
 * merge_country_datasets(dataset_dir): Combine all country-specific datasets into one "ALL" dataset without altering the original datasets.
