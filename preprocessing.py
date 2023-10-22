@@ -19,7 +19,7 @@ import yaml
 
 
 #%%     Variables 
-dataset_dir = r'D:\Ahmad\Work\KFUPM\Term 231\Senior Project\Computer Vision\Datasets\RDD2022\RDD2022'
+dataset_dir = "" # Provide the path to RDD2022 dataset as explained in the readme file
 
 classes = ['D00', 'D01', 'D10', 'D11', 'D20', 'D40', 'D43', 'D44']
 
@@ -597,7 +597,7 @@ dataset_statistics = get_dataset_plots(dataset_dir, classes)
 
 #%%     Dataset Preprocessing (visualize_dataset)
 
-visualize_dataset(dataset_dir, num_images=10)
+visualize_dataset(dataset_dir, num_images=10) # "num_images" is the number of images to visualize
 
 
 #%%     Dataset Preprocessing (merge_country_datasets) 
@@ -630,60 +630,9 @@ plot_class_distribution(dataset_dir, classes)
 
 #%%     Dataset Preprocessing (create yaml file) ||  (It is enough to run this code only once)
 
-# create_yaml(dataset_dir, classes) # Uncomment this line to create yaml file
+# create_yaml(dataset_dir, classes) # Uncomment this line to create the yaml file
 
 
-
-
-
-#%%     Some train settings (used in model.train())
-
-data = 'data.yaml' # (str, optional) path to data file, i.e. coco128.yaml
-epochs = 3 # Number of epochs for training (int)
-patience = 50  # (int) epochs to wait for no observable improvement for early stopping of training
-batch = 16  # (int) number of images per batch (-1 for AutoBatch)
-imgsz = 640  # (int | list) input images size as int for train and val modes, or list[w,h] for predict and export modes
-workers = 8  # (int) number of worker threads for data loading (per RANK if DDP)
-pretrained = True  # (bool | str) whether to use a pretrained model (bool) or a model to load weights from (str)
-optimizer =  'auto'  # (str) optimizer to use, choices=[SGD, Adam, Adamax, AdamW, NAdam, RAdam, RMSProp, auto]
-cos_lr = False  # (bool) use cosine learning rate scheduler
-resume = False  # (bool) resume training from last checkpoint
-
-
-# To see all model settings and hyperparameters can be found here:
-# C:\Users\ahmad\anaconda3\envs\YOLOv8\Lib\site-packages\ultralytics\cfg\default.yaml
-
-#%%     Get Yolo mode
-
-# The ultralytics package is avaliable at: C:\Users\ahmad\anaconda3\envs\YOLOv8\Lib\site-packages\ultralytics
-
-
-# check software and hardware
-import ultralytics
-ultralytics.checks()
-from ultralytics import YOLO
-
-
-# Load a model ['n', 's', 'm', 'l', 'x']
-# model = YOLO('yolov8n.yaml')  # build a new model from scratch
-model = YOLO('yolov8s.pt')  # load a pretrained model (recommended for training)
-
-
-#%%     Train the model
-results = model.train(data=data, epochs=epochs)  # train the model
-
-#%%     Validate the model
-results = model.val()  # evaluate model performance on the validation set
-    
-
-#%%     Export the model
-# results = model('image_path')  # predict on an image
-# results = model.export(format='onnx')  # export the model to ONNX format
-    
-    
-    
-    
-    
     
     
     

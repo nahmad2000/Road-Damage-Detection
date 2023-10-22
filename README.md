@@ -69,7 +69,54 @@ dataset_dir = path to "RDD2022" folder containing the 7 sub-datasets (countries-
 ##### Note:
 Some functions should only be excuted once. If excuted more than once then the dataset might be ruined! See comments in the preprocessing.py script.
 
+#### Output
+After Running the preprocessing.py script you will get the following:
+
+- New folder called "ALL" will be created inside the "RDD2022" folder.
+	- This folder is the dataset that will be used for training and testing YOLOv8
+	- This folder contains three folders: "train", "valid", and "test". Additionally, a yaml file will be created.
+	- Inside each one of these three folders there are two folders: "images" and "labels"
+	- The labels follow YOLOv8 format
+- Plots will be generated for data visuallization including:
+	- Number of images per country.
+	- Number of objects per class for each country.
+	- Combined number of objects per class (considering all contries).
+	- Class distribution after splitting the dataset into train/valid/test.
 
 ### 2. yolov8.py
-This Python script facilitates training a YOLOv8 model using the preprocessed RDD2022 dataset. Customization of dataset paths, configuration, and model training settings is required.
-It will be added later In Shaa Allah.
+
+This Python script will be used for training a YOLOv8 model using the preprocessed RDD2022 dataset.
+
+#### Functions:
+
+* model.train(): This function is used to train the model
+* model.val(): This function is used to validate the model
+
+#### Dependencies:
+
+You nned to install ultralytics pacakge as following:
+
+```
+pip install ultralytics
+```
+
+#### Usage:
+
+* YOLOv8 comes with 5 sizes [nano, small, medium, large, xlarge], to choose one of these versions you just need to specify the letter corresponding to the desired size as follow:
+
+```
+# Choose from ['n', 's', 'm', 'l', 'x']
+model = YOLO('yolov8s.pt')  # load a small pretrained model
+model = YOLO('yolov8n.pt')  # load a nano pretrained model
+
+```
+
+* If you want to build a model from scratch then you should use this code instead:
+
+```
+# Choose from ['n', 's', 'm', 'l', 'x']
+model = YOLO('yolov8n.yaml')
+```
+
+* To see all model hyperparameters and settings, you need to check the default.yaml file.
+This can be found in "ultralytics\cfg\default.yaml"
