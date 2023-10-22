@@ -94,7 +94,7 @@ This Python script will be used for training a YOLOv8 model using the preprocess
 
 #### Dependencies:
 
-You nned to install ultralytics pacakge as following:
+You need to install ultralytics pacakge as following:
 
 ```
 pip install ultralytics
@@ -102,7 +102,7 @@ pip install ultralytics
 
 #### Usage:
 
-* YOLOv8 comes with 5 sizes [nano, small, medium, large, xlarge], to choose one of these versions you just need to specify the letter corresponding to the desired size as follow:
+* YOLOv8 comes with 5 sizes [nano, small, medium, large, xlarge], to choose one of these sizes you just need to specify the corresponding letter of the desired size as follow:
 
 ```
 # Choose from ['n', 's', 'm', 'l', 'x']
@@ -111,7 +111,7 @@ model = YOLO('yolov8n.pt')  # load a nano pretrained model
 
 ```
 
-* If you want to build a model from scratch then you should use this code instead:
+* If you want to build a model from scratch then you should use this code instead of pretrained:
 
 ```
 # Choose from ['n', 's', 'm', 'l', 'x']
