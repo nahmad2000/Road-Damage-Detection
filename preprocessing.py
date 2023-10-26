@@ -19,12 +19,23 @@ import yaml
 
 
 #%%     Variables 
-dataset_dir = r'D:\Ahmad\Work\KFUPM\Term 231\Senior Project\Computer Vision\Datasets\RDD2022\RDD2022'
+dataset_dir = '' # Path to RDD2022 dataset as described in github
 
 classes = ['D00', 'D01', 'D10', 'D11', 'D20', 'D40', 'D43', 'D44']
 
+new_classes = ['Longitudinal-Crack', 'Lateral-Crack', 'Alligator-Crack', 'Other Corruption']
 
-
+convert_classes = {
+    0:0,
+    1:0,
+    2:1,
+    3:1,
+    4:2,
+    5:3,
+    6:3,
+    7:3
+    }
+    
 #%%     Functions
 
 def check_dataset(dataset_dir):
@@ -235,9 +246,9 @@ def get_dataset_plots(dataset_dir, classes):
     plt.xticks(rotation=45, ha="right")
     plt.show()
 
-    return combined_class_instances
 
 
+        
 def visualize_dataset(dataset_dir, num_images):
     '''
     This function will show random images from the dataset with their bounding boxes and class labels.
@@ -400,26 +411,17 @@ def remove_empty_images_and_labels(dataset_dir):
     print("Empty label files and their corresponding images have been removed.")
 
 
-def merge_diff_classes(dataset_dir):
+def merge_diff_classes(dataset_dir, convert_classes):
     '''
     This function will merge different classes based on the defined "convert_classes" dict in this function.
     
     It takes:
         - dataset_dir (str): path to the dataset folder. 
+        - convert_classes (dict): containing the way we will convert classes.
     
     The outcome of this function is a new folder called "Final-DataSet" in the same 'dataset_dir' path.
     '''
-    
-    convert_classes = {
-        1:0,
-        2:1,
-        3:1,
-        4:2,
-        5:3,
-        6:3,
-        7:3
-        }
-    
+
     labels_folder = os.path.join(dataset_dir, 'all', 'train', 'labels')
     
     for label_file in os.listdir(labels_folder):
@@ -441,9 +443,45 @@ def merge_diff_classes(dataset_dir):
                 file.write(line)
         
                 
+def get_dataset_statistics(dataset_dir):
+    '''
+    This function will loop through all label files in the dataset to generate a dictionary containing
+    the number of objects per class for the entire dataset.
+    
+    It takes:
+        - dataset_dir (str): path to the dataset folder. 
+    It returns:
+        - dataset_statistics (dict): Dictionary containing the number of objects per class for the entire dataset.
+    '''
+    
+    dataset_statistics = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0
+    }
+    
+    labels_folder = os.path.join(dataset_dir, 'all', 'train', 'labels')
+    
+    for label_file in os.listdir(labels_folder):
+        label_path = os.path.join(labels_folder, label_file)
+        
+        with open(label_path, 'r') as file:
+            lines = file.readlines()
+            
+            for line in lines:
+                object_idx = int(line.split()[0])
+                if object_idx in dataset_statistics:
+                    dataset_statistics[object_idx] += 1
+
+    print("dataset_statistics dictionary has been generated successfully!")
+    return dataset_statistics
+
+
 
     
-def split_dataset(dataset_dir, dataset_statistics, classes):
+    
+def split_dataset(dataset_dir, dataset_statistics, new_classes):
     
     '''
     This function will split the dataset into train/valid/test with a split ratio 0.7/0.1/0.2
@@ -451,7 +489,7 @@ def split_dataset(dataset_dir, dataset_statistics, classes):
     It takes:
         - dataset_dir (str): path to the dataset folder. 
         - dataset_statistics (dict): dictionary containing the number of objects per class.
-        - classes (list): list containing the object classes ordered in the correct way.
+        - new_classes (list): list containing the new_classes ordered in the correct way.
         
     The combined_dataset_dir contains only "train" folder, so after runing this function:
         We will have 2 more folders: "valid" and "test"
@@ -460,13 +498,13 @@ def split_dataset(dataset_dir, dataset_statistics, classes):
     take into account the number of objects per class in train/valid/test.
     
     Approach to achieve this:
-        1) rearrange the dataset_statistics dict to have classes ranked from min to max
-        2) iterate thorugh keys of dataset_statistics dict class by class
-        3) for class_name in dataset_statistics.keys():
+        1) rearrange the dataset_statistics dict to have new_classes ranked from min to max ==> call it 'sorted_classes'.
+        2) iterate thorugh keys of dataset_statistics dictionary class by class:
+        3) for class_idx in sorted_classes:
             3.1) create empty files_list list
             3.2) itertate thoruh all labels
-            3.3) if a label contains an object from this class_name, then add this label file to files_list
-            3.4) if len(files_list) = dataset_statistics[class_name]: stop itertating through labels
+            3.3) if a label contains an object_idx = class_idx, then add this label file to files_list
+            3.4) if len(files_list) = dataset_statistics[class_idx]: stop itertating through labels
             3.5) else: keep iterating unitl you finish all labels
             3.6) randomly shuffle the files_list
             3.7) move 10% of files_list into "valid" folder
@@ -488,12 +526,12 @@ def split_dataset(dataset_dir, dataset_statistics, classes):
             folder_path = os.path.join(dataset_dir, 'all', folder, sub_folder)
             os.makedirs(folder_path, exist_ok=True)
     
-    # Rearrange the dataset_statistics dict to have classes ranked from min to max
+    # Rearrange the dataset_statistics dict to have new_classes ranked from min to max
     sorted_classes = sorted(dataset_statistics.keys(), key=lambda k: dataset_statistics[k])
     
-    for class_name in sorted_classes:
+    for class_idx in sorted_classes:
         # Get the number of label files for this class
-        num_files = dataset_statistics[class_name]
+        num_files = dataset_statistics[class_idx]
         
         # Create an empty list to collect label files for this class
         files_list = []
@@ -507,7 +545,7 @@ def split_dataset(dataset_dir, dataset_statistics, classes):
             with open(label_path, 'r') as file:
                 lines = file.readlines()
                 # Check if this label file contains objects from the current class
-                if any(int(line.split()[0]) == classes.index(class_name) for line in lines):
+                if any(int(line.split()[0]) == class_idx for line in lines):
                     files_list.append(label_file)
                     if len(files_list) == num_files:
                         break
@@ -547,16 +585,16 @@ def split_dataset(dataset_dir, dataset_statistics, classes):
     
 
 
-def plot_class_distribution(dataset_dir, classes):
+def plot_class_distribution(dataset_dir, new_classes):
     '''
     This function will print and plot the class distribution after we split dataset into train, valid, test
     '''
     
     dataset_split = ["train", "valid", "test"]
-    class_counts = {split: {class_name: 0 for class_name in classes} for split in dataset_split}
+    class_counts = {split: {class_name: 0 for class_name in new_classes} for split in dataset_split}
     
     for split in dataset_split:
-        for class_name in classes:
+        for class_name in new_classes:
             labels_dir = os.path.join(dataset_dir, "all", split, "labels")
             for label_file in os.listdir(labels_dir):
                 label_path = os.path.join(labels_dir, label_file)
@@ -564,27 +602,27 @@ def plot_class_distribution(dataset_dir, classes):
                 with open(label_path, 'r') as file:
                     lines = file.readlines()
                     for line in lines:
-                        if int(line.split()[0]) == classes.index(class_name):
+                        if int(line.split()[0]) == new_classes.index(class_name):
                             class_counts[split][class_name] += 1
     
     # Print the results
     for split in dataset_split:
         print(f"Class distribution in {split} split:")
-        for class_name in classes:
+        for class_name in new_classes:
             print(f"{class_name}: {class_counts[split][class_name]} objects")
         print()  # Add an empty line for separation
     
     # Create a bar plot
-    x = range(len(classes))
+    x = range(len(new_classes))
     width = 0.2
     for split in dataset_split:
-        counts = [class_counts[split][class_name] for class_name in classes]
+        counts = [class_counts[split][class_name] for class_name in new_classes]
         plt.bar([i + width * dataset_split.index(split) for i in x], counts, width, label=split)
     
     plt.xlabel('Classes')
     plt.ylabel('Number of Objects')
     plt.title('Class Distribution in Train, Valid, and Test Splits')
-    plt.xticks([i + width for i in x], classes)
+    plt.xticks([i + width for i in x], new_classes)
     plt.legend()
     
     plt.show()
@@ -592,14 +630,14 @@ def plot_class_distribution(dataset_dir, classes):
 
 
 
-def create_yaml(dataset_dir, classes):
+def create_yaml(dataset_dir, new_classes):
     '''
     This function will create a yaml file for a given dataset.
     The created yaml file will be in the same given dataset path.
     
     It takes:
         - dataset_dir (str): path to the dataset folder. 
-        - classes (list): list of strings containing all classes.
+        - new_classes (list): list of strings containing all new_classes.
         
     '''
     
@@ -607,8 +645,8 @@ def create_yaml(dataset_dir, classes):
     data = {
         'train': f'{os.path.join(combined_dataset_dir, "train", "images")}',
         'val': f'{os.path.join(combined_dataset_dir, "valid", "images")}',
-        'nc': len(classes),
-        'names': classes
+        'nc': len(new_classes),
+        'names': new_classes
     }
 
     yaml_content = yaml.dump(data, default_flow_style=False)
@@ -631,12 +669,12 @@ check_dataset(dataset_dir)
 # **************(This code should be run only once)**************
 # **************(This code should be run only once)**************
 
-# convert_annotation(dataset_dir, classes) # Uncomment this line to do the conversion 
+convert_annotation(dataset_dir, classes) # Uncomment this line to do the conversion 
 
 
 #%%     Dataset Preprocessing (get_dataset_plots)
 
-dataset_statistics = get_dataset_plots(dataset_dir, classes)
+get_dataset_plots(dataset_dir, classes)
 
 #%%     Dataset Preprocessing (visualize_dataset)
 
@@ -649,12 +687,12 @@ visualize_dataset(dataset_dir, num_images=10)
 # **************(This code should be run only once)**************
 # **************(This code should be run only once)**************
 
-# merge_country_datasets(dataset_dir) # Uncomment this line to do the merge 
+merge_country_datasets(dataset_dir) # Uncomment this line to do the merge 
 
 
 #%%     Dataset Preprocessing (remove_empty_images_and_labels)  ||  (It is enough to run this code only once)
 
-# remove_empty_images_and_labels(dataset_dir) # Uncomment this line to do the removal 
+remove_empty_images_and_labels(dataset_dir) # Uncomment this line to do the removal 
 
 
 #%%     Dataset Preprocessing (merge_diff_classes)
@@ -663,7 +701,12 @@ visualize_dataset(dataset_dir, num_images=10)
 # **************(This code should be run only once)**************
 # **************(This code should be run only once)**************
 
-merge_diff_classes(dataset_dir)
+merge_diff_classes(dataset_dir, convert_classes)
+
+
+#%%     Dataset Preprocessing (get_dataset_statistics)
+
+dataset_statistics = get_dataset_statistics(dataset_dir)
 
 #%%     Dataset Preprocessing (split dataset)
 
@@ -671,15 +714,16 @@ merge_diff_classes(dataset_dir)
 # **************(This code should be run only once)**************
 # **************(This code should be run only once)**************
 
-#split_dataset(dataset_dir, dataset_statistics, classes) # Uncomment this line to do the split
+split_dataset(dataset_dir, dataset_statistics, new_classes) # Uncomment this line to do the split
+
 #%%     Dataset Preprocessing (plot_class_distribution)
 
-plot_class_distribution(dataset_dir, classes) 
+plot_class_distribution(dataset_dir, new_classes) 
 
 
 #%%     Dataset Preprocessing (create yaml file) ||  (It is enough to run this code only once)
 
-# create_yaml(dataset_dir, classes) # Uncomment this line to create yaml file
+create_yaml(dataset_dir, new_classes) # Uncomment this line to create yaml file
 
 
 
