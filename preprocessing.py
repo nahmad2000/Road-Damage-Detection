@@ -19,7 +19,7 @@ import yaml
 
 
 #%%     Variables 
-dataset_dir = "" # Provide the path to RDD2022 dataset as explained in the readme file
+dataset_dir = r'D:\Ahmad\Work\KFUPM\Term 231\Senior Project\Computer Vision\Datasets\RDD2022\RDD2022'
 
 classes = ['D00', 'D01', 'D10', 'D11', 'D20', 'D40', 'D43', 'D44']
 
@@ -400,8 +400,50 @@ def remove_empty_images_and_labels(dataset_dir):
     print("Empty label files and their corresponding images have been removed.")
 
 
+def merge_diff_classes(dataset_dir):
+    '''
+    This function will merge different classes based on the defined "convert_classes" dict in this function.
+    
+    It takes:
+        - dataset_dir (str): path to the dataset folder. 
+    
+    The outcome of this function is a new folder called "Final-DataSet" in the same 'dataset_dir' path.
+    '''
+    
+    convert_classes = {
+        1:0,
+        2:1,
+        3:1,
+        4:2,
+        5:3,
+        6:3,
+        7:3
+        }
+    
+    labels_folder = os.path.join(dataset_dir, 'all', 'train', 'labels')
+    
+    for label_file in os.listdir(labels_folder):
+        label_path = os.path.join(labels_folder, label_file)
+        
+        with open(label_path, 'r') as file:
+            lines = file.readlines()
+        
+        
+        # Reopen the file in write mode to overwrite it with modified content
+        with open(label_path, 'w') as file:
+            for line in lines:
+                class_idx = int(line.split()[0])
+                if class_idx in convert_classes:
+                    new_class_idx = convert_classes[class_idx]
+                    # Update the class index in the line
+                    line = line.replace(str(class_idx), str(new_class_idx), 1)
+                # Write the updated line to the same file
+                file.write(line)
+        
+                
 
-def split_dataset(dataset_dir, dataset_statistics):
+    
+def split_dataset(dataset_dir, dataset_statistics, classes):
     
     '''
     This function will split the dataset into train/valid/test with a split ratio 0.7/0.1/0.2
@@ -409,6 +451,7 @@ def split_dataset(dataset_dir, dataset_statistics):
     It takes:
         - dataset_dir (str): path to the dataset folder. 
         - dataset_statistics (dict): dictionary containing the number of objects per class.
+        - classes (list): list containing the object classes ordered in the correct way.
         
     The combined_dataset_dir contains only "train" folder, so after runing this function:
         We will have 2 more folders: "valid" and "test"
@@ -432,11 +475,13 @@ def split_dataset(dataset_dir, dataset_statistics):
             3.10) clear files_list
     '''
     
+    
     # Define the split ratios
     train_ratio = 0.7
     valid_ratio = 0.1
   # test_ratio = 0.2
     
+  
     # Create the train/valid/test folders if they don't exist
     for folder in ["valid", "test"]:
         for sub_folder in ["images", "labels"]:
@@ -462,7 +507,7 @@ def split_dataset(dataset_dir, dataset_statistics):
             with open(label_path, 'r') as file:
                 lines = file.readlines()
                 # Check if this label file contains objects from the current class
-                if any(int(line.split()[0]) == sorted_classes.index(class_name) for line in lines):
+                if any(int(line.split()[0]) == classes.index(class_name) for line in lines):
                     files_list.append(label_file)
                     if len(files_list) == num_files:
                         break
@@ -472,8 +517,8 @@ def split_dataset(dataset_dir, dataset_statistics):
         random.shuffle(files_list)
         
         # Determine the split sizes
-        num_train = int(train_ratio * num_files)
-        num_valid = int(valid_ratio * num_files)
+        num_train = int(train_ratio * len(files_list))
+        num_valid = int(valid_ratio * len(files_list))
         
         # Split the files_list into train, valid, and test
         valid_files = files_list[num_train:num_train + num_valid]
@@ -573,8 +618,6 @@ def create_yaml(dataset_dir, classes):
     with open(yaml_file_path, 'w') as yaml_file:
         yaml_file.write(yaml_content)
 
-
-                            
                             
                             
 #%%     Dataset Preprocessing (check_dataset)
@@ -597,7 +640,7 @@ dataset_statistics = get_dataset_plots(dataset_dir, classes)
 
 #%%     Dataset Preprocessing (visualize_dataset)
 
-visualize_dataset(dataset_dir, num_images=10) # "num_images" is the number of images to visualize
+visualize_dataset(dataset_dir, num_images=10)
 
 
 #%%     Dataset Preprocessing (merge_country_datasets) 
@@ -614,15 +657,21 @@ visualize_dataset(dataset_dir, num_images=10) # "num_images" is the number of im
 # remove_empty_images_and_labels(dataset_dir) # Uncomment this line to do the removal 
 
 
+#%%     Dataset Preprocessing (merge_diff_classes)
+
+# **************(This code should be run only once)**************
+# **************(This code should be run only once)**************
+# **************(This code should be run only once)**************
+
+merge_diff_classes(dataset_dir)
+
 #%%     Dataset Preprocessing (split dataset)
 
 # **************(This code should be run only once)**************
 # **************(This code should be run only once)**************
 # **************(This code should be run only once)**************
 
-# split_dataset(dataset_dir, dataset_statistics) # Uncomment this line to do the split
-
-
+#split_dataset(dataset_dir, dataset_statistics, classes) # Uncomment this line to do the split
 #%%     Dataset Preprocessing (plot_class_distribution)
 
 plot_class_distribution(dataset_dir, classes) 
@@ -630,9 +679,14 @@ plot_class_distribution(dataset_dir, classes)
 
 #%%     Dataset Preprocessing (create yaml file) ||  (It is enough to run this code only once)
 
-# create_yaml(dataset_dir, classes) # Uncomment this line to create the yaml file
+# create_yaml(dataset_dir, classes) # Uncomment this line to create yaml file
 
 
+
+
+    
+    
+    
     
     
     
