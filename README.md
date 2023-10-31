@@ -120,3 +120,29 @@ model = YOLO('yolov8n.yaml')
 
 * To see all model hyperparameters and settings, you need to check the default.yaml file.
 This can be found in "ultralytics\cfg\default.yaml"
+
+
+### 3. augmentation.py
+This Python script is designed to augment image data and copy label data from a training dataset. It uses the `imgaug` library to apply augmentation techniques to the images, and `shutil` to copy the label files.
+The augmentation that will be done are mix of brightness, contrast, and hue.
+
+
+#### Usage:
+
+1. Ensure you have the required libraries installed. You can install them using the following command:
+
+```
+pip install imgaug opencv-python-headless
+```
+
+2. Specify the path to train dataset folder at the beginning of the code.
+
+3. Run the code
+
+#### Output:
+
+1. After Running the code you will have a new folder inside the RDD2022 dataset folder called "augmented_train" along with "train", "valid", and "test" folders and the yaml file.
+2. Now all you need to do is to modify the train path in the yaml file to point toward this "augmented_train" folder.
+
+
+
